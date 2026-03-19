@@ -157,6 +157,10 @@ function useConversationSetup() {
         }
 
         let processedConfig = structuredClone(config.peek());
+        if (!processedConfig.userId) {
+          processedConfig.userId = getOrCreateUserId();
+        }
+
         // If the user started the conversation with a text message, and the
         // agent supports it, switch to text-only mode.
         if (initialMessage && widgetConfig.value.supports_text_only) {
@@ -441,6 +445,18 @@ function useConversationSetup() {
       },
     };
   }, [config]);
+}
+
+function getOrCreateUserId(): string {
+  const STORAGE_KEY = "elevenlabs_convai_user_id";
+  let userId = localStorage.getItem(STORAGE_KEY);
+
+  if (!userId) {
+    // Generate new UUID for this user
+    userId = crypto.randomUUID();
+    localStorage.setItem(STORAGE_KEY, userId);
+  }
+  return userId;
 }
 
 function triggerCallEvent(
