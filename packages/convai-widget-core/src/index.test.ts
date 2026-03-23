@@ -1,5 +1,13 @@
 import { page, userEvent } from "@vitest/browser/context";
-import { describe, it, beforeAll, beforeEach, expect, afterAll } from "vitest";
+import {
+  describe,
+  it,
+  beforeAll,
+  beforeEach,
+  expect,
+  afterAll,
+  vi,
+} from "vitest";
 import { Worker } from "./mocks/browser";
 import { setupWebComponent } from "./mocks/web-component";
 import { Variants } from "./types/config";
@@ -758,6 +766,19 @@ describe("elevenlabs-convai", () => {
     beforeEach(() => {
       // Clear localStorage before each test to ensure clean slate
       localStorage.clear();
+    });
+
+    beforeAll(() => {
+      // Mock FingerprintJS for tests
+      vi.mock("@fingerprintjs/fingerprintjs", () => ({
+        default: {
+          load: vi.fn().mockResolvedValue({
+            get: vi.fn().mockResolvedValue({
+              visitorId: "test-fingerprint-id-123",
+            }),
+          }),
+        },
+      }));
     });
 
     it.each(Variants)(
