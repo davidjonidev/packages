@@ -3,10 +3,12 @@
   "version": "1.0.2",
   "description": "ElevenLabs React Native SDK for the Agents Platform",
   "type": "module",
+  "react-native": "./dist/index.react-native.js",
+  "main": "./dist/index.js",
   "exports": {
     ".": {
-      "browser": "./dist/index.js",
       "react-native": "./dist/index.react-native.js",
+      "browser": "./dist/index.js",
       "default": "./dist/index.js"
     }
   },

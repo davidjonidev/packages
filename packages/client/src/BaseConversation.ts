@@ -356,6 +356,15 @@ export abstract class BaseConversation {
   }
 
   protected handleErrorEvent(event: ErrorMessageEvent) {
+    // Guard against malformed server events where error_event payload is missing.
+    // The type says error_event is required, but the server can omit it at runtime
+    // (e.g. transport-level errors, incomplete WebSocket frames). Without this
+    // check the destructure throws and kills the connection.
+    if (!event.error_event) {
+      this.onError("Received error event without payload", {});
+      return;
+    }
+
     const errorType = event.error_event.error_type;
     const message =
       event.error_event.message || event.error_event.reason || "Unknown error";

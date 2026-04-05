@@ -1,3 +1,8 @@
+// DOM polyfills must run before any @elevenlabs/client or livekit-client code
+// loads — they reference browser globals (document, HTMLAudioElement, Event,
+// etc.) that don't exist in React Native.
+import "./polyfills";
+
 import {
   registerGlobals,
   AudioSession,
