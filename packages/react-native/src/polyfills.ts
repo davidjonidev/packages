@@ -93,6 +93,105 @@ if (typeof (globalThis as any).Audio === "undefined") {
   (globalThis as any).Audio = (globalThis as any).HTMLAudioElement;
 }
 
+// ---- Web Audio API stubs ----
+// The @elevenlabs/client uses AudioContext for input volume analysis and output
+// routing. In React Native, actual audio capture and playback is handled
+// natively by @livekit/react-native-webrtc — these stubs prevent ReferenceErrors
+// in the JS layer without affecting native audio behaviour.
+
+class StubAnalyserNode {
+  fftSize = 2048;
+  frequencyBinCount = 1024;
+  smoothingTimeConstant = 0.8;
+  connect() {
+    return this;
+  }
+  disconnect() {}
+  getByteFrequencyData() {}
+  getFloatTimeDomainData() {}
+}
+
+class StubGainNode {
+  gain = { value: 1, setValueAtTime: () => {} };
+  connect() {
+    return this;
+  }
+  disconnect() {}
+}
+
+class StubMediaStreamSource {
+  connect() {
+    return this;
+  }
+  disconnect() {}
+}
+
+class StubMediaStreamDestination {
+  stream = typeof MediaStream !== "undefined" ? new MediaStream() : {};
+  connect() {
+    return this;
+  }
+  disconnect() {}
+}
+
+class StubAudioWorkletNode {
+  port = {
+    postMessage: () => {},
+    onmessage: null as ((e: any) => void) | null,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  };
+  connect() {
+    return this;
+  }
+  disconnect() {}
+  addEventListener() {}
+  removeEventListener() {}
+}
+
+if (typeof (globalThis as any).AudioContext === "undefined") {
+  (globalThis as any).AudioContext = class StubAudioContext {
+    state = "running";
+    sampleRate = 44100;
+    destination = { connect: () => {} };
+    createAnalyser() {
+      return new StubAnalyserNode();
+    }
+    createGain() {
+      return new StubGainNode();
+    }
+    createMediaStreamSource() {
+      return new StubMediaStreamSource();
+    }
+    createMediaStreamDestination() {
+      return new StubMediaStreamDestination();
+    }
+    addModule() {
+      return Promise.resolve();
+    }
+    get audioWorklet() {
+      return { addModule: () => Promise.resolve() };
+    }
+    resume() {
+      return Promise.resolve();
+    }
+    suspend() {
+      return Promise.resolve();
+    }
+    close() {
+      return Promise.resolve();
+    }
+  };
+}
+
+if (typeof (globalThis as any).webkitAudioContext === "undefined") {
+  (globalThis as any).webkitAudioContext = (globalThis as any).AudioContext;
+}
+
+if (typeof (globalThis as any).AudioWorkletNode === "undefined") {
+  (globalThis as any).AudioWorkletNode = StubAudioWorkletNode;
+}
+
 // ---- document stub ----
 
 if (typeof globalThis.document === "undefined") {
